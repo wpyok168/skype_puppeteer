@@ -46,8 +46,8 @@ namespace skype_puppeteer
                 //await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision); //自动下载chrome
                 LaunchOptions option = new LaunchOptions();
                 option.Headless = false;
-                // "--start-maximized",
-                option.Args = new string[] { "--use-fake-ui-for-media-stream", "--proxy-server=socks5://127.0.0.1:10808" };//浏览器窗口最大化 及使用代理服务器
+                // "--start-maximized","--no-sandbox", "--disable-setuid-sandbox",
+                option.Args = new string[] { "--no-sandbox", "--disable-setuid-sandbox", "--use-fake-ui-for-media-stream", "--proxy-server=socks5://127.0.0.1:10808" };//浏览器窗口最大化 及使用代理服务器
                 //option.DefaultViewport = new ViewPortOptions() { Width = width, Height = height };
                 //string path = Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\ChromeHTML\shell\open\command", null, null) as string;
                 string path = "D:\\Program Files (x86)\\Chrome\\chrome.exe";
@@ -96,7 +96,7 @@ namespace skype_puppeteer
                 }
 
                 page.DOMContentLoaded += Page_DOMContentLoaded;
-                page.Response += Page_Response;
+               // page.Response += Page_Response;
                 page.RequestFinished += Page_RequestFinished;
                 await page.WaitForTimeoutAsync(10000);
                 //await page.CloseAsync();
@@ -134,13 +134,18 @@ namespace skype_puppeteer
                     
                     try
                     {
-                        string html = await e.Response.TextAsync();
-                        JObject json = await e.Response.JsonAsync();
-                       // Debug.Print(html);
-                    }
-                    catch (Exception)
-                    {
 
+                        if (e.Response!=null)
+                        {
+                            string html = await e.Response.TextAsync();
+                            JObject json = await e.Response.JsonAsync();
+                            //Debug.Print(html);
+                        }
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                       // Console.WriteLine(ex.Message.ToString());
                     }
                 }
                 
@@ -177,27 +182,28 @@ namespace skype_puppeteer
 
                 while (true)
                 {
-                   var t = Task.Run(() => {
-                       try
-                       {
-                           string jsstr = "var tq =document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh\");\r\n    if(tq.length>0){\r\n        var content=document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh>div>div\");\r\n        if(content.length>0){\r\n            var fy = content[content.length-1];\r\n            //alert(fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\"));\r\n           fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\");\r\n        }\r\n   }";
-                           var ret = page.EvaluateFunctionAsync("()=>{var tq =document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh\");\r\n    if(tq.length>0){\r\n        var content=document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh>div>div\");\r\n        if(content.length>0){\r\n            var fy = content[content.length-1];\r\n            //alert(fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\"));\r\n       return    fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\");\r\n        }\r\n   }}");
-                           
-                           if (ret.Result!=null)
-                           {
-                               Debug.Print(ret.Result.ToString());
-                           }
-                          
-                       }
-                       catch (Exception)
-                       {
-                            
-                       }
-                        
+                    var t = Task.Run(() =>
+                    {
+                        try
+                        {
+                            //string jsstr = "var tq =document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh\");\r\n    if(tq.length>0){\r\n        var content=document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh>div>div\");\r\n        if(content.length>0){\r\n            var fy = content[content.length-1];\r\n            //alert(fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\"));\r\n           fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\");\r\n        }\r\n   }";
+                            var ret = page.EvaluateFunctionAsync("()=>{var tq =document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh\");\r\n    if(tq.length>0){\r\n        var content=document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh>div>div\");\r\n        if(content.length>0){\r\n            var fy = content[content.length-1];\r\n            //alert(fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\"));\r\n            return fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\");\r\n        }\r\n   }\r\n   return \"null\"}");
+
+                            if (ret.Result != null)
+                            {
+                                Debug.Print(ret.Result.ToString());
+                            }
+
+                        }
+                        catch (Exception)
+                        {
+
+                        }
+
                     });
-                   t.Wait();
-                    
-                    System.Threading.Thread.Sleep(2000);
+                    t.Wait();
+
+                    System.Threading.Thread.Sleep(3000);
 
                 }
 
@@ -208,9 +214,9 @@ namespace skype_puppeteer
                 //timer.Enabled = true;
                 //timer.Tick += Timer_Tick;
                 //timer.Start();
-                
+
                 //string jsstr = "var interval1 = setInterval(function() {\r\n        var tq =document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh\");\r\nif(tq.length>0){\r\n    var content=document.querySelectorAll(\".css-1dbjc4n.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-11yh6sk.r-1rnoaur.r-2eszeu.r-1sncvnh>div>div\");\r\n    if(content.length>0){\r\n        var fy = content[content.length-1];\r\n        alert(fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\"));\r\n        return fy.children[0].children[0].getAttribute(\"data-text-as-pseudo-element\");\r\n    }\r\n}\r\n    },\r\n    800);";
-               // var ret = page.EvaluateExpressionAsync(jsstr);
+                // var ret = page.EvaluateExpressionAsync(jsstr);
             }
         }
 
